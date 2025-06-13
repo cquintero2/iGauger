@@ -1,148 +1,377 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Meta tags and title -->
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>iGauger - Oilfield Knowledge Base</title>
-  <link rel="stylesheet" href="output.css">
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AGA3 Calculator - Gas Flow Calculator</title>
+
+  <!-- Tailwind CSS CDN for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome CDN for Icons (Version 4.7.0) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <!-- Custom Styles -->
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+
+    /* Transition for smoother hover effects */
+    .transition-all {
+      transition: all 0.3s ease;
+    }
+
+    /* Loading Screen Styles */
+    #loading-screen {
+      background-color: white;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999; /* Ensure it's on top */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Hide the loading screen when not needed */
+    #loading-screen.hidden {
+      display: none;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5); /* Black with opacity */
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    .close-modal {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close-modal:hover,
+    .close-modal:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
-<body class="font-sans bg-secondary min-h-screen flex flex-col">
-  <!-- Header -->
-  <header class="bg-primary text-white">
-    <div class="mx-auto max-w-3xl px-6 py-3 flex items-center justify-between">
-      <h1><a href="index.html" class="text-xl font-bold">iGauger</a></h1>
-      <nav class="space-x-4">
-        <a href="index.html" class="hover:underline">Home</a>
-        <a href="calculator.html" class="hover:underline">Calculator</a>
-        <a href="tank-estimator.html" class="hover:underline">Tank Estimator</a>
-        <a href="blog.html" class="hover:underline">Blog</a>
-        <a href="about.html" class="hover:underline">About</a>
-      </nav>
+<body class="bg-white md:bg-gradient-to-r md:from-blue-500 md:to-blue-600">
+
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <img src="aga3calculator/loading.gif" alt="Loading...">
+  </div>
+
+  <!-- Header with Blue Background on Mobile and White on Desktop -->
+  <header class="bg-blue-600 md:bg-white shadow-md fixed w-full z-30 px-4">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex justify-between h-16">
+        <!-- Logo and Brand Name -->
+        <div class="flex items-center">
+          <img src="Public/logo.png" alt="Logo" class="h-8 w-8">
+          <span class="ml-2 text-xl font-bold text-white md:text-gray-800">iGauger</span>
+        </div>
+        <!-- Navigation Links (Desktop) -->
+        <div class="hidden md:flex space-x-8 items-center">
+          <a href="index.html" class="text-gray-700 hover:text-blue-600 font-medium transition-all">Home</a>
+          <a href="calculator.html" class="text-gray-700 hover:text-blue-600 font-medium transition-all">Calculator</a>
+          <a href="blog.html" class="text-gray-700 hover:text-blue-600 font-medium transition-all">Blog</a>
+          <a href="about.html" class="text-gray-700 hover:text-blue-600 font-medium transition-all">About</a>
+        </div>
+        <!-- Mobile Menu Button -->
+        <div class="flex items-center md:hidden">
+          <button id="mobile-menu-button" class="text-white hover:text-blue-300 focus:outline-none focus:text-blue-300" aria-label="Toggle navigation" aria-expanded="false">
+            <i class="fa fa-bars text-2xl"></i>
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
-  <main class="flex-grow">
-    <!-- Hero Section -->
-    <section class="bg-white py-8">
-      <div class="mx-auto max-w-3xl px-6">
-        <h2 class="text-3xl font-bold text-gray-800 mb-4 text-center">Welcome to iGauger</h2>
-        <p class="text-lg text-gray-700 mb-6 text-center">Your Oilfield Knowledge Base - 15 Years of Expertise at Your Fingertips</p>
-        <div class="flex justify-center space-x-4">
-          <a href="calculator.html" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded transition">MCF Calculator</a>
-          <a href="tank-estimator.html" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded transition">Tank Estimator (Coming Soon)</a>
+  <!-- Mobile Navigation Menu -->
+  <div id="mobile-menu" class="hidden md:hidden bg-blue-600 text-white shadow-md absolute top-16 left-0 w-full z-20">
+    <a href="index.html" class="block px-4 py-2 hover:bg-blue-700">Home</a>
+    <a href="calculator.html" class="block px-4 py-2 hover:bg-blue-700">Calculator</a>
+    <a href="blog.html" class="block px-4 py-2 hover:bg-blue-700">Blog</a>
+    <a href="about.html" class="block px-4 py-2 hover:bg-blue-700">About</a>
+  </div>
+
+  <!-- Main Content Wrapper -->
+  <main class="pt-20 pb-16">
+    
+    <!-- Calculator Content Section with White Background -->
+    <section id="calculator-section" class="calculator-container mx-auto p-4 md:p-6 bg-white rounded-none md:rounded-lg shadow-none md:shadow-lg max-w-3xl my-0 md:my-8">
+      <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-6">AGA3 Gas Flow Calculator</h1>
+
+      <center><a href="index.html" class="px-4 py-2 hover:bg-blue-100">How does it work?</a></center>
+      
+      <form id="mcfCalculator" class="space-y-6">
+        <!-- Static Pressure Field -->
+        <div class="form-group">
+          <label for="staticPressure" class="block text-lg font-semibold text-gray-700">Static Pressure (PSI)</label>
+          <input type="number" id="staticPressure" name="staticPressure" class="w-full h-12 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter static pressure" required>
         </div>
-      </div>
+
+        <!-- Differential Pressure Field -->
+        <div class="form-group">
+          <label for="differentialPressure" class="block text-lg font-semibold text-gray-700">Differential Pressure (DP)</label>
+          <input type="number" id="differentialPressure" name="differentialPressure" class="w-full h-12 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter differential pressure" required>
+        </div>
+
+        <!-- Meter Size Dropdown -->
+        <div class="form-group">
+          <label for="meterSize" class="block text-lg font-semibold text-gray-700">Meter Size (inches)</label>
+          <select id="meterSize" name="meterSize" class="w-full h-12 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            <option value="" disabled selected>Select meter size</option>
+            <option value="2">2 inch</option>
+            <option value="3">3 inch</option>
+            <option value="4">4 inch</option>
+          </select>
+        </div>
+
+        <!-- Orifice Plate Size Dropdown -->
+        <div class="form-group">
+          <label for="plateSize" class="block text-lg font-semibold text-gray-700">Orifice Plate Size (inches)</label>
+          <select id="plateSize" name="plateSize" class="w-full h-12 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            <option value="" disabled selected>Select plate size</option>
+            <option value="0.250">0.250</option>
+            <option value="0.375">0.375</option>
+            <option value="0.500">0.500</option>
+            <option value="0.625">0.625</option>
+            <option value="0.750">0.750</option>
+            <option value="0.875">0.875</option>
+            <option value="1.000">1.000</option>
+          </select>
+        </div>
+
+        <!-- Well Identifier Field -->
+        <div class="form-group">
+          <label for="wellIdentifier" class="block text-lg font-semibold text-gray-700">Well Identifier (Optional)</label>
+          <input type="text" id="wellIdentifier" name="wellIdentifier" class="w-full h-12 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter well name and number">
+        </div>
+
+        <!-- Result Display -->
+        <div id="resultDisplay" class="result-highlight text-center text-xl font-semibold text-blue-600 min-h-12"></div>
+
+        <!-- Submit Buttons -->
+        <div class="flex flex-col md:flex-row md:space-x-4">
+          <button type="button" onclick="saveMCF()" class="cta-button w-full py-3 mb-4 md:mb-0 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg shadow-md transition-all">
+            <i class="fa fa-save mr-2"></i> Save Entry
+          </button>
+          <button type="button" onclick="openManualEntry()" class="cta-button w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition-all">
+            <i class="fa fa-pencil mr-2"></i> Manual Entry
+          </button>
+        </div>
+      </form>
     </section>
 
-    <!-- Blog Preview Section -->
-    <section class="bg-gray-100 py-8">
-      <div class="mx-auto max-w-3xl px-6">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6">Latest Blog Posts</h2>
-        <div class="space-y-4">
-          <article class="bg-white p-4 rounded-lg shadow-lg">
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">Understanding Gas Flow Calculations</h3>
-            <p class="text-gray-600 mb-2">Learn the fundamentals of AGA3 calculations and how to apply them in the field.</p>
-            <a href="blog.html#post1" class="text-blue-800 hover:underline">Read More</a>
-          </article>
-          <article class="bg-white p-4 rounded-lg shadow-lg">
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">Troubleshooting Common Meter Issues</h3>
-            <p class="text-gray-600 mb-2">Tips and tricks for diagnosing and fixing meter-related problems based on real-world experience.</p>
-            <a href="blog.html#post2" class="text-blue-800 hover:underline">Read More</a>
-          </article>
-        </div>
-        <div class="text-center mt-6">
-          <a href="blog.html" class="text-blue-800 font-semibold hover:underline">View All Posts</a>
-        </div>
+    <!-- Manual Entry Modal -->
+    <div id="manual-entry-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal" onclick="closeManualEntry()">&times;</span>
+        <h2 class="text-2xl font-bold mb-4 text-center text-gray-800">Manual Entry</h2>
+        <form id="manualEntryForm" class="space-y-6">
+          <!-- Well Name Field -->
+          <div class="form-group">
+            <label for="manualWellIdentifier" class="block text-lg font-semibold text-gray-700">Well Name</label>
+            <input type="text" id="manualWellIdentifier" name="manualWellIdentifier" class="w-full h-12 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter well name and number" required>
+          </div>
+          <!-- Static Pressure Field -->
+          <div class="form-group">
+            <label for="manualStaticPressure" class="block text-lg font-semibold text-gray-700">Static Pressure (PSI)</label>
+            <input type="number" id="manualStaticPressure" name="manualStaticPressure" class="w-full h-12 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter static pressure" required>
+          </div>
+          <!-- MCF Field -->
+          <div class="form-group">
+            <label for="manualMCF" class="block text-lg font-semibold text-gray-700">MCF</label>
+            <input type="number" id="manualMCF" name="manualMCF" class="w-full h-12 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter MCF value" required>
+          </div>
+          <!-- Save Button -->
+          <button type="button" onclick="saveManualEntry()" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg shadow-md transition-all">
+            <i class="fa fa-save mr-2"></i> Save Manual Entry
+          </button>
+        </form>
       </div>
-    </section>
+    </div>
 
-    <!-- About Section -->
-    <section class="bg-white py-8">
-      <div class="mx-auto max-w-3xl px-6">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6">About iGauger</h2>
-        <p class="text-gray-700 mb-4">
-          I’ve been a gauger for 15 years, and now I’m building free resources to help others in the field. iGauger is a growing hub with tools like the MCF Calculator and plans for a Tank Estimator. My mission is to share practical insights, tutorials, and troubleshooting guides to make your work easier.
+
+
+    
+    <!-- Info Section with White Background (Hidden on Mobile) -->
+    <section class="info-section hidden md:block mx-auto p-4 md:p-6 bg-white rounded-none md:rounded-lg shadow-none md:shadow-lg max-w-3xl my-0 md:my-8">
+      <div class="flex items-center space-x-4">
+        <i class="fa fa-info-circle text-blue-500 text-4xl"></i>
+        <p class="text-gray-800 text-base md:text-lg leading-relaxed">
+          I’ve been a gauger for 15 years, and now I’m building free resources to help others in the field. I’ve got plans to add tutorials 
+          and training to make things easier for anyone working in this industry. It’s tough to find the right info sometimes, and I want 
+          to change that. Let me know what you think—I’m always open to feedback!
         </p>
-        <p class="text-gray-700">
-          Let me know what you think—I’m always open to feedback!
-        </p>
       </div>
     </section>
 
-    <!-- Article Submission Form -->
-    <section class="bg-gray-100 py-8">
-      <div class="mx-auto max-w-lg px-6">
-        <h2 class="text-3xl font-bold text-gray-800 mb-4 text-center">Submit a Blog Article</h2>
-        <p class="text-gray-700 mb-6 text-center">Share your oilfield expertise with the community!</p>
-        <div class="bg-white p-8 rounded-lg shadow-lg">
-          <div class="space-y-4">
-            <div class="space-y-1">
-              <label for="name" class="block text-sm font-semibold text-gray-700">Name</label>
-              <input type="text" id="name" class="w-full p-3 border border-gray-300 rounded" placeholder="Your Name">
-            </div>
-            <div class="space-y-1">
-              <label for="email" class="block text-sm font-semibold text-gray-700">Email</label>
-              <input type="email" id="email" class="w-full p-3 border border-gray-300 rounded" placeholder="Your Email">
-            </div>
-            <div class="space-y-1">
-              <label for="article-title" class="block text-sm font-semibold text-gray-700">Article Title</label>
-              <input type="text" id="article-title" class="w-full p-3 border border-gray-300 rounded" placeholder="Proposed Article Title">
-            </div>
-            <div class="space-y-1">
-              <label for="article-content" class="block text-sm font-semibold text-gray-700">Article Summary or Draft</label>
-              <textarea id="article-content" class="w-full p-3 border border-gray-300 rounded" rows="5" placeholder="Briefly describe your article or paste the draft"></textarea>
-            </div>
-            <div class="flex justify-center space-x-4">
-              <button onclick="submitArticle()" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded transition">Submit Article</button>
-            </div>
+    <!-- More Info Section with Complementary Color -->
+    <section class="more-info-section mx-auto p-4 md:p-6 bg-blue-100 rounded-none md:rounded-lg shadow-none md:shadow-lg max-w-3xl my-0 md:my-8 text-gray-800">
+      <div class="flex flex-col md:flex-row items-center md:items-start">
+        <!-- Text Content -->
+        <div class="md:w-1/2">
+          <h2 class="text-2xl md:text-3xl font-bold mb-4 text-center md:text-left">Support This Free Tool</h2>
+          <p class="text-base md:text-lg mb-6 text-center md:text-left">
+            Help keep this calculator running by making a donation! Your support allows me to maintain and improve the tool, add new features, 
+            and provide more resources for professionals in the field.
+          </p>
+          <!-- Call-to-Action Button -->
+          <div class="flex justify-center md:justify-start">
+            <a href="#" class="cta-button inline-flex items-center px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg shadow-md transition-all">
+              <i class="fa fa-heart-o mr-2"></i> Donate
+            </a>
           </div>
         </div>
+        <!-- Armadillo Image -->
+        <div class="md:w-1/2 mt-6 md:mt-0 md:ml-8 flex justify-center">
+          <img src="../aga3calculator/Public/armadillo2.png" alt="Armadillo" class="w-32 h-32 md:w-48 md:h-48 object-contain">
+        </div>
       </div>
     </section>
+
+    <!-- Saved MCF Entries Table with White Background -->
+    <section class="entries-section mx-auto p-4 md:p-6 bg-white rounded-none md:rounded-lg shadow-none md:shadow-lg max-w-3xl my-0 md:my-8">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Saved Entries</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-100">
+            <tr>
+              <!-- Well Header -->
+              <th 
+                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" 
+                onclick="sortTable('well')">
+                Well 
+                <i id="sort-well" class="fa fa-sort text-sm ml-1"></i>
+              </th>
+              <!-- Static Pressure Header -->
+              <th 
+                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" 
+                onclick="sortTable('static')">
+                Static (PSI) 
+                <i id="sort-static" class="fa fa-sort text-sm ml-1"></i>
+              </th>
+              <!-- Diff (DP) Header (Hidden on mobile) -->
+              <th 
+                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                Diff (DP)
+              </th>
+              <!-- MCFs Header -->
+              <th 
+                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" 
+                onclick="sortTable('mcf')">
+                MCFs 
+                <i id="sort-mcf" class="fa fa-sort text-sm ml-1"></i>
+              </th>
+              <!-- Action Header -->
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+            </tr>
+          </thead>
+          <tbody id="mcfList" class="bg-white divide-y divide-gray-200">
+            <!-- MCF entries will be dynamically populated by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
   </main>
 
-  <!-- Footer -->
-  <footer class="bg-primary text-white py-4">
-    <div class="mx-auto max-w-3xl px-6 text-center">
-      <nav class="mb-4 space-x-4">
-        <a href="index.html" class="hover:underline">Home</a>
-        <a href="calculator.html" class="hover:underline">Calculator</a>
-        <a href="tank-estimator.html" class="hover:underline">Tank Estimator</a>
-        <a href="blog.html" class="hover:underline">Blog</a>
-        <a href="about.html" class="hover:underline">About</a>
-      </nav>
-      <div class="flex justify-center space-x-4 mb-4">
-        <a href="#" class="text-white hover:text-gray-300"><i class="fa fa-facebook"></i></a>
-        <a href="#" class="text-white hover:text-gray-300"><i class="fa fa-twitter"></i></a>
-        <a href="#" class="text-white hover:text-gray-300"><i class="fa fa-linkedin"></i></a>
+  <!-- Footer with Blue Background on Mobile and White on Desktop -->
+  <footer class="bg-blue-600 md:bg-white text-white md:text-gray-700 py-6 px-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
+      <!-- Footer Links -->
+      <div class="flex space-x-6 mb-4 md:mb-0">
+        <a href="index.html" class="hover:text-blue-300 transition-all">Home</a>
+        <a href="calculator.html" class="hover:text-blue-300 transition-all">Calculator</a>
+        <a href="blog.html" class="hover:text-blue-300 transition-all">Blog</a>
+        <a href="about.html" class="hover:text-blue-300 transition-all">About</a>
       </div>
-      <p>© Ceelo Bean. All rights reserved.</p>
+      <!-- Social Media Icons -->
+      <div class="flex space-x-4">
+        <a href="#" class="hover:text-blue-300 transition-all">
+          <i class="fa fa-facebook"></i>
+        </a>
+        <a href="#" class="hover:text-blue-300 transition-all">
+          <i class="fa fa-twitter"></i>
+        </a>
+        <a href="#" class="hover:text-blue-300 transition-all">
+          <i class="fa fa-linkedin"></i>
+        </a>
+        <a href="#" class="hover:text-blue-300 transition-all">
+          <i class="fa fa-github"></i>
+        </a>
+      </div>
+    </div>
+    <!-- Copyright -->
+    <div class="mt-4 text-center text-sm">
+      © <span id="currentYear"></span> Ceelo Bean. All rights reserved.
     </div>
   </footer>
 
+  <!-- External JavaScript -->
+  <script src="scripts.js" defer></script>
+  <!-- Inline JavaScript for Mobile Menu Toggle and Current Year -->
   <script>
-    function submitArticle() {
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const title = document.getElementById('article-title').value.trim();
-      const content = document.getElementById('article-content').value.trim();
+    // Toggle Mobile Menu with Accessibility Enhancements
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
 
-      if (!name || !email || !title || !content) {
-        alert('Please fill out all fields before submitting.');
-        return;
-      }
+    if (mobileMenuButton && mobileMenu) {
+      mobileMenuButton.addEventListener('click', () => {
+        const isHidden = mobileMenu.classList.toggle('hidden');
 
-      // Placeholder for form submission logic
-      alert('Thank you for your submission! We will review your article and get back to you soon.');
-
-      // Clear form
-      document.getElementById('name').value = '';
-      document.getElementById('email').value = '';
-      document.getElementById('article-title').value = '';
-      document.getElementById('article-content').value = '';
+        // Update ARIA attributes for accessibility
+        mobileMenuButton.setAttribute('aria-expanded', !isHidden);
+        mobileMenu.setAttribute('aria-hidden', isHidden);
+      });
+    } else {
+      console.error("Mobile menu elements not found.");
     }
+
+    // Set Current Year in Footer
+    const currentYearElement = document.getElementById('currentYear');
+    if (currentYearElement) {
+      currentYearElement.textContent = new Date().getFullYear();
+    } else {
+      console.error("Current Year element not found.");
+    }
+
+    // Hide the loading screen when the page has fully loaded
+    window.addEventListener('load', function() {
+      var loadingScreen = document.getElementById('loading-screen');
+      if (loadingScreen) {
+        loadingScreen.classList.add('hidden');
+      }
+    });
   </script>
+
 </body>
 </html>
